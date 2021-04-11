@@ -1,53 +1,32 @@
 import graphene
-from django.db.models import Q
-from graphene import ObjectType
+from graphene import relay, ObjectType
 from graphene_django import DjangoObjectType
+from graphene_django.filter import DjangoFilterConnectionField
+
+from products.models import Products
 from .models import Orders, Order_products
 
 
-class OrderType(DjangoObjectType):
+class OrderNode(DjangoObjectType):
     class Meta:
         model = Orders
+        filter_fields = ['customer_id']
+        interfaces = (relay.Node,)
+
+
+class OrderProductsNode(DjangoObjectType):
+    class Meta:
+        model = Order_products
+        filter_fields = {
+            'product': ['exact'],
+            'order_id': ['exact'],
+        }
+        interfaces = (relay.Node,)
 
 
 class Query(graphene.ObjectType):
-    orders = graphene.List(
-        OrderType,
-        customer_id=graphene.Int(),
-        created_at=graphene.DateTime,
-        updated_at=graphene.DateTime
-    )
+    order = relay.Node.Field(OrderNode)
+    all_orders = DjangoFilterConnectionField(OrderNode)
 
-    def resolve_orders(self, info, customer_id):
-        all_orders = Orders.objects.all()
-        if orders_id:
-            filter = Q(customer_id__contains=customer_id)
-            filtered = all_orders.filter(filter)
-        return filtered
-
-
-class addOrder(graphene.Mutation):
-    addOrder = graphene.Field(OrderType)
-
-    class Arguments:
-        order_id = graphene.Int(required=True)
-
-    def mutate(self, info, order_id, **kwargs):
-        user = info.context.user
-        if user.is_anonymous:
-            raise Exception("Não esta logado!")
-
-        order = Orders(
-            order_id = order_id
-        )
-        order.save()
-
-        return addOrder(addOrder=order)
-
-
-class Order_productType(DjangoObjectType):
-    class Meta:
-        model = Order_products
-
-# class Query(graphene.ObjectType):
-#
+    orderProduct = relay.Node.Field(OrderProductsNode)
+    all_orderProducts = DjangoFilterConnectionField(OrderProductsNode)

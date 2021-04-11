@@ -135,11 +135,11 @@ STATIC_URL = '/static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-AUTH_USER_MODEL = 'customers.ExtendUser'
+# AUTH_USER_MODEL = 'customers.ExtendUser'
 
 
 GRAPHENE = {
-    'SCHEMA': 'customers.schema.schema',
+    'SCHEMA': 'core.schema.schema',
     'MIDDLEWARE': [
         'graphql_jwt.middleware.JSONWebTokenMiddleware',
     ],

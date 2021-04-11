@@ -1,9 +1,9 @@
 from django.contrib import admin
-from .models import ExtendUser
+from .models import User
 from django.apps import apps
 
 
-admin.site.register(ExtendUser)
+admin.site.register(User)
 
 app = apps.get_app_config('graphql_auth')
 
